@@ -3,10 +3,11 @@ services:
     pgsql-server:
         image: postgres:9
         container_name: pgsql-server
-        environment: 
-            POSTGRES_PASSWORD: $PG_PASS
-            POSTGRES_USER: $PG_USER
-            POSTGRES_DB: $PG_DB
+        env_file: ./.env
+        environment:
+            POSTGRES_PASSWORD: ${PG_PASS}
+            POSTGRES_USER: ${PG_USER}
+            POSTGRES_DB: ${PG_DB}
             POSTGRES_HOST_AUTH_METHOD: md5
             PGDATA: /var/lib/postgresql/data/pgdata
         volumes: 
@@ -15,26 +16,28 @@ services:
     zabbix-server:
         image: zabbix/zabbix-server-pgsql
         container_name: zabbix-server
+        env_file: ./.env
         environment: 
             DB_SERVER_HOST: pgsql-server
-            POSTGRES_USER: $PG_USER
-            POSTGRES_PASSWORD: $PG_PASS
+            POSTGRES_USER: ${PG_USER}
+            POSTGRES_PASSWORD: ${PG_PASS}
         ports: 
-            - $EXT_ZBX_PORT:10051
+            - ${EXT_ZBX_PORT}:10051
         links: 
             - pgsql-server
     
     zabbix-web-nginx:
         image: zabbix/zabbix-web-nginx-pgsql
         container_name: zabbix-web-nginx
+        env_file: ./.env
         environment: 
             DB_SERVER_HOST: pgsql-server
-            POSTGRES_USER: $PG_USER
-            POSTGRES_PASSWORD: $PG_PASS
+            POSTGRES_USER: ${PG_USER}
+            POSTGRES_PASSWORD: ${PG_PASS}
             ZBX_SERVER_HOST: zabbix-server
-            PHP_TZ: $PHP_TZ
+            PHP_TZ: ${PHP_TZ}
         links: 
             - pgsql-server
         ports: 
-            - $EXT_WEB_PORT:8080
-            - $EXT_WEB_SEC_PORT:8443
+            - ${EXT_WEB_PORT}:8080
+            - ${EXT_WEB_SEC_PORT}:8443
